@@ -21,7 +21,7 @@ backgroundImage.onload = function () {
 };
 
 const wineImg = new Image();
-wineImg.src = 'pictures/wine.png';
+wineImg.src = 'pictures/glassOfWine.png';
 
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
