@@ -1,3 +1,15 @@
+// For canvas
+const background = document.getElementById("background");
+const context = background.getContext("2d");
+
+const backgroundImage = new Image();
+backgroundImage.src = "pictures/background inspirational wonderful.png";
+
+backgroundImage.onload = function() {
+    context.drawImage(backgroundImage, 0,0, background.width, background.height);
+};
+
+
 velocityY -= jumpForce;
 velocityY += gravity;
 
@@ -19,3 +31,5 @@ if (player.y >= groundY) { // >= since happens when player below ground level si
     if (!player.isOnGround) {
     airtime += 1
     }
+
+
