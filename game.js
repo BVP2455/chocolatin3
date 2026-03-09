@@ -1,3 +1,15 @@
+// For canvas
+const background = document.getElementById("background");
+const context = background.getContext("2d");
+
+const backgroundImage = new Image();
+backgroundImage.src = "pictures/background inspirational wonderful.png";
+
+backgroundImage.onload = function() {
+    context.drawImage(backgroundImage, 0,0, background.width, background.height);
+};
+
+
 velocityY -= jumpForce;
 velocityY += gravity;
 
@@ -31,5 +43,13 @@ document.addEventListener("keydown", function(event) {
     }
 
 
+<<<<<<< HEAD
     
     }
+=======
+    if (!player.isOnGround) {
+    airtime += 1
+    }
+
+
+>>>>>>> 006328cf7182f346ba362c462eb49ef4a8b3d06e
