@@ -2,9 +2,19 @@
 let score = 0;
 
 let board;
-let context;
 
-//Make sure the images are loaded before we start drawing
+
+
+
+// Setting up the canvas and context
+const background = document.getElementById("background");
+const context = background.getContext("2d");
+
+// Displaying the score on the canvas
+context.font = "10 px Times New Roman"
+context.fillText("Score", 10, 20)
+
+//Implementing the picture to be the background
 const backgroundImage = new Image();
 backgroundImage.src = "pictures/background inspirational wonderful.png";
 
