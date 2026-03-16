@@ -4,10 +4,11 @@ let count = 0;
 
 
 
-// For canvas
+// Setting up the canvas and context
 const background = document.getElementById("background");
 const context = background.getContext("2d");
 
+// Displaying the score on the canvas
 context.font = "10 px Times New Roman"
 context.fillText("Score", 10, 20)
 
