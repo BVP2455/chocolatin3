@@ -12,8 +12,8 @@ const groundY = 250;
 let wine = {
     x: 50,
     y: groundY,
-    width: 100,
-    height: 150,
+    width: 50,
+    height: 80,
     velocityY: 0,
     gravity: 0.6,
     jumpForce: -15,
@@ -44,6 +44,9 @@ airplaneImg.src = 'pictures/airplane.png';
 let candleImg = new Image();
 candleImg.src = 'pictures/candle.png';
 
+let tarteImg = new Image();
+tarteImg.src = 'pictures/tarte0.png';
+
 const wineImages= [wineRight, wineLeft];
 let imageIndex = 0;
 
@@ -52,7 +55,7 @@ setInterval(function() {
 }, 150); // Change image every 500 milliseconds
 
 let obstacles = [];
-let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg];
+let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
 let spawnTimer = 0;
 
 function updatePlayer() {
@@ -95,9 +98,9 @@ function spawnObstacle() {
     let isAir = (type === airplaneImg);
     obstacles.push({
         x: canvas.width,
-        y: isAir ? 220 : 320,
-        width: 60,
-        height: 50,
+        y: isAir ? 180 : 280,
+        width: 80,
+        height: 60,
         image: type
     });
 }
