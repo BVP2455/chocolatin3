@@ -29,8 +29,11 @@ wineRight.src = 'pictures/glassOfWineRight.png';
 const wineLeft = new Image();
 wineLeft.src = 'pictures/glassOfWineLeft.png';
 
-const wineStand= new Image();
-wineStand.src = 'pictures/glassOfWineStand.png';
+const wineStand = new Image();
+wineStand.src = 'pictures/glassOfWineClose.png';
+
+const wineBroken = new Image();
+wineBroken.src = 'pictures/glassOfWineCasse.png';
 
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
@@ -133,6 +136,7 @@ function gameLoop() {
     if (isGameOver) return;
     updatePlayer();
     updateObstacles();
+    if (isGameOver) return;
     score += 0.1;
     draw();
     requestAnimationFrame(gameLoop);
@@ -140,7 +144,9 @@ function gameLoop() {
 
 //function to handle game over when the player collides with an obstacle
 function handleGameOver() {
+    if (isGameOver) return;
     isGameOver = true;
+    draw();
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
@@ -149,7 +155,6 @@ function handleGameOver() {
     
     setTimeout(() => {
         alert("Final score: " + Math.floor(score));
-        resetGame();
     }, 100);
 }
 
@@ -182,7 +187,9 @@ window.onload = function() {
 
 // glass of wine walking
 function wineWalk() {
-    if (isGameOver) return;
+    if (isGameOver) {
+        return wineBroken;
+    }
     if (score===0&& wine.isOnGround) {
         return wineStand;
     }
