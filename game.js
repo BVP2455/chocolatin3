@@ -29,6 +29,9 @@ wineRight.src = 'pictures/glassOfWineRight.png';
 const wineLeft = new Image();
 wineLeft.src = 'pictures/glassOfWineLeft.png';
 
+const wineStand= new Image();
+wineStand.src = 'pictures/glassOfWineStand.png';
+
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
 
@@ -40,6 +43,9 @@ airplaneImg.src = 'pictures/airplane.png';
 
 let candleImg = new Image();
 candleImg.src = 'pictures/candle.png';
+
+const wineImages= [wineRight, wineLeft];
+let imageIndex = 0;
 
 setInterval(function() { 
     imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
@@ -105,7 +111,7 @@ function draw() {
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     // Draw player (simple animation based on velocity)
-    let currentSprite = wine.velocityY < 0 ? wineLeft : wineRight;
+    let currentSprite = wineWalk();
     ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
 
     // Draw obstacles
@@ -170,3 +176,15 @@ window.onload = function() {
     setInterval(spawnObstacle, 1500); // Spawn every 1.5 sec
     gameLoop();
 };
+
+// glass of wine walking
+function wineWalk() {
+    if (isGameOver) return;
+    if (score===0&& wine.isOnGround) {
+        return wineStand;
+    }
+    if (!wine.isOnGround) {
+        return wineImages[imageIndex];
+    }
+    return wineImages[imageIndex];
+}
