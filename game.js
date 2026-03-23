@@ -1,47 +1,27 @@
-//Counting score
-let score = 0;
-
-let board;
-
-
 // Setting up the canvas and context
-const background = document.getElementById("background");
-const context = background.getContext("2d");
+const canvas = document.getElementById("background");
+const ctx = canvas.getContext("2d");
 
-// Displaying the score on the canvas
-context.font = "10 px Times New Roman"
-context.fillText("Score", 10, 20)
+let score = 0;
+let gameSpeed = 6;
+let isGameOver = false;
 
-//Implementing the picture to be the background
-const backgroundImage = new Image();
-backgroundImage.src = "pictures/background inspirational wonderful.png";
+//ground for loop
+const groundY = 250;
 
-const wineImageStart = new Image();
-wineImageStart.src = "pictures/glassOfWineClose.png";
-
-// The start function
-window.onload = function() {
-    board = document.getElementById("background");
-    console.log(board.width);
-    console.log(board.height);
-    context = board.getContext("2d");
-
-        
-        wineImageStart.onload = function() {
-            context.drawImage(wineImageStart, 50, 100, 60, 80);
-        }
-        
-    
-        
-    
-    //backgroundImage.onload = drawStartScreen;
-    //wineImageStart.onload = drawStartScreen;
-
-    //requestAnimationFrame(gameLoop);
-    //setInterval(spawnObstacles,1000);
- 
+let wine = {
+    x: 50,
+    y: groundY,
+    width: 100,
+    height: 150,
+    velocityY: 0,
+    gravity: 0.6,
+    jumpForce: -15,
+    isOnGround: true
 };
 
+const backgroundImage = new Image();
+backgroundImage.src = "pictures/background inspirational wonderful.png";
 
 const wineRight = new Image();
 wineRight.src = 'pictures/glassOfWineRight.png';
@@ -61,98 +41,52 @@ airplaneImg.src = 'pictures/airplane.png';
 let candleImg = new Image();
 candleImg.src = 'pictures/candle.png';
 
-let tarteImg = new Image();
-tarteImg.src = 'pictures/tarte0.png';
-
-let gameSpeed = 6;
-let isGameOver = false;
-
-//For making the wine glass look like it's moving by toggling between two images
-let wineImages = [wineLeft, wineRight]
-let imageIndex = 0;
-
 setInterval(function() { 
     imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
 }, 150); // Change image every 500 milliseconds
 
-let wine = {
-    x: 50,
-    y: 300,
-    width: 60,
-    height: 80,
-    velocityY: 0,
-    gravity: 0.6,
-    jumpForce: -12,
-    isOnGround: true
-};
-
 let obstacles = [];
-let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
+let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg];
 let spawnTimer = 0;
-let backgroundX = 0;
 
-
-//ground for loop
-const groundY = 300;
-let airTime = 0;
-
-/*window.onload = function(){
-    // start of game 
-    document.addEventListener("keydown", function (event) {
-        if (event.code === "Enter" && !isGameOver){
-        gameLoop();}
-    });
-    requestAnimationFrame(gameLoop);
-    setInterval(spawnObstacles,1000);
-    
-}*/
-
-// game loop 
-function gameLoop() {
-    if (isGameOver){
-        context.font ="30px arial"
-        context.fillText("Game Over",200,200);
-        return;
-    }
-    // clear and draw
-    context.clearRect(0, 0, background.width, background.height);
-    context.drawImage(backgroundImage, 0, 0, background.width, background.height);
-    //move the glass
-    moveg();
-    context.drawImage(wineImg,wine.x,wine.y,wine.width,wine.height);
-    
-    moveObstacles();
-    score++;
-    
-    requestAnimationFrame(gameLoop);
-}
-
-function moveg(){
-    // move player by velocity
-    wine.y += wine.velocityY;   
+function updatePlayer() {
+    // Apply gravity
+    wine.y += wine.velocityY;
     wine.velocityY += wine.gravity;
-
-    // get wine back on ground -> not below 
-    if (wine.y >= groundY) { // >= since happens when player below ground level since top of screen 0 and towards buttom higher number y 
-        wine.y = groundY; // reset player to ground level
-        wine.velocityY = 0
+    // Ground collision
+    if (wine.y >= groundY) {
+        wine.y = groundY;
+        wine.velocityY = 0;
         wine.isOnGround = true;
     }
 }
-// the jump itself keyboard event 
-document.addEventListener("keydown", function (event) {
-    if (event.code === "Space" && wine.isOnGround) {
-        wine.velocityY = -15; // Adjust jump hight)
-        wine.isOnGround = false;
+
+function updateObstacles() {
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        obstacles[i].x -= gameSpeed;
+        // Check collision
+        if (checkCollision(wine, obstacles[i])) {
+            handleGameOver();
+        }
+        // Remove obstacles that are off-screen
+        if (obstacles[i].x + obstacles[i].width < 0) {
+            obstacles.splice(i, 1);
+        }
     }
-});
+}
+
+function checkCollision(player, obj) {
+    return player.x < obj.x + obj.width &&
+           player.x + player.width > obj.x &&
+           player.y < obj.y + obj.height &&
+           player.y + player.height > obj.y;
+}
 
 //generate obstacles at random intervals and types
-function spawnObstacles() {
-    if (isGameOver) { return; }
-    spawnTimer++;
+function spawnObstacle() {
+    if (isGameOver) return;    
     let type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-    isAir = (type === airplaneImg);
+    let isAir = (type === airplaneImg);
     obstacles.push({
         x: canvas.width,
         y: isAir ? 220 : 320,
@@ -162,45 +96,77 @@ function spawnObstacles() {
     });
 }
 
-// obstacles moving
-function moveObstacles() {
-    for (let i = 0; i < obstacles.length; i++) {
-        obstacles[i].x -= gameSpeed;
-        context.drawImage(obstacles[i].image, obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height);
-        collision(obstacle[i]);
-    }
-}   
+//function to draw different elements of the game such as the background, player, obstacles and score
+function draw() {
+    // Clear screen
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw background
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+    // Draw player (simple animation based on velocity)
+    let currentSprite = wine.velocityY < 0 ? wineLeft : wineRight;
+    ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
+
+    // Draw obstacles
+    obstacles.forEach(obj => {
+        ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+    });
+
+    // Draw score
+    ctx.fillStyle = "black";
+    ctx.font = "20px Arial";
+    ctx.fillText(`Score: ${Math.floor(score)}`, 20, 30);
+}
+
+//game loop
+function gameLoop() {
+    if (isGameOver) return;
+    updatePlayer();
+    updateObstacles();
+    score += 0.1;
+    draw();
+    requestAnimationFrame(gameLoop);
+}
 
 //function to handle game over when the player collides with an obstacle
 function handleGameOver() {
     isGameOver = true;
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.font = "40px Arial";
+    ctx.fillText("GAME OVER", canvas.width / 2 - 100, canvas.height / 2);
+    
     setTimeout(() => {
-        alert("Game Over! Your score: " + score);
+        alert("Final score: " + Math.floor(score));
         resetGame();
     }, 100);
-}
-
-function collision(obstacle){
-    if ( wine.x < obstacle.x + obstacle.width && wine.x + wine.width > obstacle.x &&
-        wine.y< obstacle.y + obstacle.height && wine.y + wine.height > obstacle.y ){
-        handleGameOver();
-    }  
 }
 
 //function to reset the game when the player loses
 function resetGame() {
     score = 0;
     obstacles = [];
-    wine.y = 300;
+    wine.y = groundY;
     wine.velocityY = 0;
     isGameOver = false;
+    gameLoop();
 }
 
-//function to change the wine sprite right to left and vice versa
-function wineSprite() {
-    if (wine.velocityY < 0) {
-        return wineLeft;
-    } else {
-        return wineRight;
+// User input
+document.addEventListener("keydown", function (event) {
+    if (event.code === "Space" && wine.isOnGround) {
+        wine.velocityY = wine.jumpForce;
+        wine.isOnGround = false;
     }
-}
+    if (event.code === "Enter" && isGameOver) {
+        resetGame();
+    }
+});
+
+// the jump itself keyboard event
+window.onload = function() {
+    setInterval(spawnObstacle, 1500); // Spawn every 1.5 sec
+    gameLoop();
+};
