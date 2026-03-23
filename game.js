@@ -149,13 +149,15 @@ function handleGameOver() {
     draw();
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "white";
-    ctx.font = "40px Arial";
+    ctx.fillStyle = "black";
+    ctx.font = "40px Times New Roman";
     ctx.fillText("GAME OVER", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.font = "20px Times New Roman"; // smaller font
+    ctx.fillText("Press Enter to play again", canvas.width / 2 - 100, canvas.height / 2 + 50); // +50 puts it below
     
-    setTimeout(() => {
-        alert("Final score: " + Math.floor(score));
-    }, 100);
+    //setTimeout(() => {
+       // alert("Final score: " + Math.floor(score));
+   // }, 100);
 }
 
 //function to reset the game when the player loses
