@@ -12,8 +12,8 @@ const groundY = 250;
 let wine = {
     x: 50,
     y: groundY,
-    width: 100,
-    height: 150,
+    width: 50,
+    height: 80,
     velocityY: 0,
     gravity: 0.6,
     jumpForce: -15,
@@ -29,6 +29,12 @@ wineRight.src = 'pictures/glassOfWineRight.png';
 const wineLeft = new Image();
 wineLeft.src = 'pictures/glassOfWineLeft.png';
 
+const wineStand = new Image();
+wineStand.src = 'pictures/glassOfWineClose.png';
+
+const wineBroken = new Image();
+wineBroken.src = 'pictures/glassOfWineCasse.png';
+
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
 
@@ -41,7 +47,10 @@ airplaneImg.src = 'pictures/airplane.png';
 let candleImg = new Image();
 candleImg.src = 'pictures/candle.png';
 
-let wineImages = [wineRight, wineLeft];
+let tarteImg = new Image();
+tarteImg.src = 'pictures/tarte0.png';
+
+const wineImages= [wineRight, wineLeft];
 let imageIndex = 0;
 
 setInterval(function() { 
@@ -49,7 +58,8 @@ setInterval(function() {
 }, 150); // Change image every 500 milliseconds
 
 let obstacles = [];
-let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg];
+let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
+let spawnTimer = 0;
 
 function updatePlayer() {
     // Apply gravity
@@ -91,9 +101,9 @@ function spawnObstacle() {
     let isAir = (type === airplaneImg);
     obstacles.push({
         x: canvas.width,
-        y: isAir ? 220 : 320,
-        width: 60,
-        height: 50,
+        y: isAir ? 180 : 280,
+        width: 80,
+        height: 60,
         image: type
     });
 }
@@ -107,7 +117,7 @@ function draw() {
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
     // Draw player (simple animation based on velocity)
-    let currentSprite = wine.velocityY < 0 ? wineLeft : wineRight;
+    let currentSprite = wineWalk();
     ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
 
     // Draw obstacles
@@ -126,6 +136,7 @@ function gameLoop() {
     if (isGameOver) return;
     updatePlayer();
     updateObstacles();
+    if (isGameOver) return;
     score += 0.1;
     draw();
     requestAnimationFrame(gameLoop);
@@ -133,7 +144,9 @@ function gameLoop() {
 
 //function to handle game over when the player collides with an obstacle
 function handleGameOver() {
+    if (isGameOver) return;
     isGameOver = true;
+    draw();
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
@@ -142,7 +155,6 @@ function handleGameOver() {
     
     setTimeout(() => {
         alert("Final score: " + Math.floor(score));
-        resetGame();
     }, 100);
 }
 
@@ -186,4 +198,19 @@ function nextObstacle() {
         spawnObstacle();
         nextObstacle();
     }, randomDelay);
+}
+
+
+// glass of wine walking
+function wineWalk() {
+    if (isGameOver) {
+        return wineBroken;
+    }
+    if (score===0&& wine.isOnGround) {
+        return wineStand;
+    }
+    if (!wine.isOnGround) {
+        return wineImages[imageIndex];
+    }
+    return wineImages[imageIndex];
 }
