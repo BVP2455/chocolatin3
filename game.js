@@ -4,8 +4,6 @@ let score = 0;
 let board;
 
 
-
-
 // Setting up the canvas and context
 const background = document.getElementById("background");
 const context = background.getContext("2d");
