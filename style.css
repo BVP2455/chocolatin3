@@ -2,4 +2,15 @@
 
 #background{ 
     background-image: url('pictures/background inspirational wonderful.png'); 
+
+    display: block;}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: lightyellow; /* Set a background color for the body */
+    display: flex;
+    justify-content: center; /* centers horizontally */
+    align-items: center;     /* centers vertically */
+    height: 100vh;           /* full screen height */
 }

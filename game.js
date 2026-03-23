@@ -41,13 +41,15 @@ airplaneImg.src = 'pictures/airplane.png';
 let candleImg = new Image();
 candleImg.src = 'pictures/candle.png';
 
+let wineImages = [wineRight, wineLeft];
+let imageIndex = 0;
+
 setInterval(function() { 
     imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
 }, 150); // Change image every 500 milliseconds
 
 let obstacles = [];
 let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg];
-let spawnTimer = 0;
 
 function updatePlayer() {
     // Apply gravity
@@ -115,7 +117,7 @@ function draw() {
 
     // Draw score
     ctx.fillStyle = "black";
-    ctx.font = "20px Arial";
+    ctx.font = "20px Times New Roman";
     ctx.fillText(`Score: ${Math.floor(score)}`, 20, 30);
 }
 
@@ -147,11 +149,13 @@ function handleGameOver() {
 //function to reset the game when the player loses
 function resetGame() {
     score = 0;
+    gameSpeed = 6;
     obstacles = [];
     wine.y = groundY;
     wine.velocityY = 0;
     isGameOver = false;
     gameLoop();
+    nextObstacle();
 }
 
 // User input
@@ -167,6 +171,19 @@ document.addEventListener("keydown", function (event) {
 
 // the jump itself keyboard event
 window.onload = function() {
-    setInterval(spawnObstacle, 1500); // Spawn every 1.5 sec
     gameLoop();
+    nextObstacle();
+
 };
+
+
+//For a more dynamic appearance of obstacles 
+function nextObstacle() {
+    if (isGameOver) return;
+    let minDelay = Math.max(600, 1500 - gameSpeed * 50);
+    let randomDelay = Math.random() * 1000 + minDelay;
+    setTimeout(function() {
+        spawnObstacle();
+        nextObstacle();
+    }, randomDelay);
+}
