@@ -229,6 +229,7 @@ document.addEventListener("keydown", function (event) {
     }
         else if (event.code === "Enter" && !gamestart) {
         gamestart = true
+        backgroundMusic.play();
         gameLoop();
         nextObstacle()
     } 
