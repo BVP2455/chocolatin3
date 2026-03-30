@@ -5,6 +5,7 @@ const ctx = canvas.getContext("2d");
 let score = 0;
 let gameSpeed = 6;
 let isGameOver = false;
+let gamestart= false;
 
 //ground for loop
 const groundY = 250;
@@ -17,7 +18,8 @@ let wine = {
     velocityY: 0,
     gravity: 0.6,
     jumpForce: -15,
-    isOnGround: true
+    isOnGround: true,
+    isbenddown: false
 };
 
 const backgroundImage = new Image();
@@ -34,6 +36,9 @@ wineStand.src = 'pictures/glassOfWineClose.png';
 
 const wineBroken = new Image();
 wineBroken.src = 'pictures/glassOfWineCasse.png';
+
+const wineDown = new Image();
+wineDown.src= 'pictures/glassOfWinedaoun.png'
 
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
@@ -78,7 +83,12 @@ function updateObstacles() {
         obstacles[i].x -= gameSpeed;
         // Check collision
         if (checkCollision(wine, obstacles[i])) {
-            handleGameOver();
+            if(obstacles[i].image=== airplaneImg && !wine.isbenddown){
+                handleGameOver()
+            }
+            else { 
+                handleGameOver();
+            }
         }
         // Remove obstacles that are off-screen
         if (obstacles[i].x + obstacles[i].width < 0) {
@@ -101,7 +111,7 @@ function spawnObstacle() {
     let isAir = (type === airplaneImg);
     obstacles.push({
         x: canvas.width,
-        y: isAir ? 180 : 280,
+        y: isAir ? 200 : 280,
         width: 80,
         height: 60,
         image: type
@@ -120,10 +130,12 @@ function draw() {
     let currentSprite = wineWalk();
     if (isGameOver) {
         ctx.drawImage(currentSprite, wine.x, wine.y, 120, 100); 
+    } else if (wine.isbenddown) {
+        ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
     } else {
         ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
     }
-
+    // Draw obstacles
     obstacles.forEach(obj => {
         ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
     });
@@ -142,6 +154,14 @@ function gameLoop() {
     score += 0.1;
     draw();
     requestAnimationFrame(gameLoop);
+}
+
+function drawstart(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage,0,0,canvas.width, canvas.height);
+    ctx.fillStyle="black";
+    ctx.font = "20px Times New Roman";
+    ctx.fillText("Press Enter to start", 20, 30);
 }
 
 //function to handle game over when the player collides with an obstacle
