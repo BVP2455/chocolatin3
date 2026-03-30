@@ -196,22 +196,41 @@ function resetGame() {
 
 // User input
 document.addEventListener("keydown", function (event) {
-    if (event.code === "Space" && wine.isOnGround) {
+    if (event.code === "Space" && wine.isOnGround && gamestart) {
         wine.velocityY = wine.jumpForce;
         wine.isOnGround = false;
-    }
+    } 
     if (event.code === "Enter" && isGameOver) {
         resetGame();
     }
+        else if (event.code === "Enter" && !gamestart) {
+        gamestart = true
+        gameLoop();
+        nextObstacle()
+    } 
+ 
 });
 
-// the jump itself keyboard event
+// onload start game 
 window.onload = function() {
-    gameLoop();
-    nextObstacle();
-
+backgroundImage.onload = function() {
+	drawStartScreen ();
+}
+ if (backgroundImage.complete) {
+        drawStartScreen();
+    }
 };
 
+// start screen
+function drawStartScreen () {
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "black";
+    ctx.font = "40px Times New Roman";
+    ctx.fillText("START GAME", canvas.width / 2 - 100, canvas.height / 2);
+    ctx.font = "20px Times New Roman"; // smaller font
+    ctx.fillText("Press Enter to start", canvas.width / 2 - 100, canvas.height / 2 + 50); // +50 puts it below
+}
 
 //For a more dynamic appearance of obstacles 
 function nextObstacle() {
