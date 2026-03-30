@@ -38,7 +38,7 @@ const wineBroken = new Image();
 wineBroken.src = 'pictures/glassOfWineCasse.png';
 
 const wineDown = new Image();
-wineDown.src= 'pictures/glassOfWinedaoun.png'
+wineDown.src= 'pictures/glassOfWinedown1.png';
 
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
@@ -83,12 +83,7 @@ function updateObstacles() {
         obstacles[i].x -= gameSpeed;
         // Check collision
         if (checkCollision(wine, obstacles[i])) {
-            if(obstacles[i].image=== airplaneImg && !wine.isbenddown){
-                handleGameOver()
-            }
-            else { 
-                handleGameOver();
-            }
+            handleGameOver();
         }
         // Remove obstacles that are off-screen
         if (obstacles[i].x + obstacles[i].width < 0) {
@@ -96,12 +91,16 @@ function updateObstacles() {
         }
     }
 }
-
+// check the collision , if it bends down the box of the player is lower
 function checkCollision(player, obj) {
+    let playerY = player.y
+    if (player.isbenddown){
+        playerY=player.y +30;
+    }
     return player.x < obj.x + obj.width &&
            player.x + player.width > obj.x &&
-           player.y < obj.y + obj.height &&
-           player.y + player.height > obj.y;
+           playerY < obj.y + obj.height &&
+           playerY + player.height > obj.y;
 }
 
 //generate obstacles at random intervals and types
@@ -129,9 +128,9 @@ function draw() {
     // Draw player (simple animation based on velocity)
     let currentSprite = wineWalk();
     if (isGameOver) {
-        ctx.drawImage(currentSprite, wine.x, wine.y, 120, 100); 
+        ctx.drawImage(currentSprite, wine.x, wine.y, 90, 100); 
     } else if (wine.isbenddown) {
-        ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
+        ctx.drawImage(currentSprite, wine.x, wine.y+20, 80, 80);
     } else {
         ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
     }
@@ -203,8 +202,15 @@ document.addEventListener("keydown", function (event) {
     if (event.code === "Enter" && isGameOver) {
         resetGame();
     }
+    if (event.code === "ArrowDown"){
+        wine.isbenddown= true;
+    }
 });
-
+document.addEventListener("keyup", function(event){
+    if (event.code=== "ArrowDown"){
+        wine.isbenddown=false;
+    }
+});
 // the jump itself keyboard event
 window.onload = function() {
     gameLoop();
@@ -230,7 +236,10 @@ function wineWalk() {
     if (isGameOver) {
         return wineBroken;
     }
-    if (score===0&& wine.isOnGround) {
+    if (wine.isbenddown){
+        return wineDown;
+    }
+    if (score===0 && wine.isOnGround) {
         return wineStand;
     }
     if (!wine.isOnGround) {
