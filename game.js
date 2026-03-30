@@ -118,17 +118,19 @@ function draw() {
 
     // Draw player (simple animation based on velocity)
     let currentSprite = wineWalk();
-    ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
+    if (isGameOver) {
+        ctx.drawImage(currentSprite, wine.x, wine.y, 120, 100); 
+    } else {
+        ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
+    }
 
-    // Draw obstacles
     obstacles.forEach(obj => {
         ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
     });
 
-    // Draw score
     ctx.fillStyle = "black";
     ctx.font = "20px Times New Roman";
-    ctx.fillText(`Score: ${Math.floor(score)}`, 20, 30);
+    ctx.fillText(`score: ${Math.floor(score)}`, 20, 30);
 }
 
 //game loop
