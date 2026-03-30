@@ -58,6 +58,14 @@ tarteImg.src = 'pictures/tarte0.png';
 const wineImages= [wineRight, wineLeft];
 let imageIndex = 0;
 
+const jumpSound = new Audio('sounds/JUMP.mp3');
+const beforeGameOverSound = new Audio('sounds/beforeGAMEOVER.mp3');
+const gameOverSound = new Audio('sounds/GAMEOVER.mp3');
+const backgroundMusic = new Audio('sounds/MUSICBG.mp3');
+
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5; // Adjust volume as needed
+
 setInterval(function() { 
     imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
 }, 150); // Change image every 500 milliseconds
@@ -65,6 +73,7 @@ setInterval(function() {
 let obstacles = [];
 let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
 let spawnTimer = 0;
+
 
 function updatePlayer() {
     // Apply gravity
@@ -168,6 +177,12 @@ function drawstart(){
 function handleGameOver() {
     if (isGameOver) return;
     isGameOver = true;
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+    beforeGameOverSound.play();
+    beforeGameOverSound.onended = function() {
+        gameOverSound.play();
+    };
     draw();
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -190,6 +205,12 @@ function resetGame() {
     wine.y = groundY;
     wine.velocityY = 0;
     isGameOver = false;
+    beforeGameOverSound.pause();
+    beforeGameOverSound.currentTime = 0;
+    gameOverSound.pause();
+    gameOverSound.currentTime = 0;
+    
+    backgroundMusic.play();
     gameLoop();
     nextObstacle();
 }
@@ -199,6 +220,9 @@ document.addEventListener("keydown", function (event) {
     if (event.code === "Space" && wine.isOnGround && gamestart) {
         wine.velocityY = wine.jumpForce;
         wine.isOnGround = false;
+        jumpSound.currentTime = 0; 
+        jumpSound.play();
+        if (backgroundMusic.paused) backgroundMusic.play();
     } 
     if (event.code === "Enter" && isGameOver) {
         resetGame();
