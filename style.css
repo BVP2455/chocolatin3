@@ -1,13 +1,7 @@
-
-
-#background{ 
-    background-image: url('pictures/background inspirational wonderful.png'); 
-
-    display: block;}
-
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
     background-color: lightyellow; /* Set a background color for the body */
     display: flex;
     justify-content: center; /* centers horizontally */

@@ -6,6 +6,7 @@ let score = 0;
 let gameSpeed = 6;
 let isGameOver = false;
 let gamestart= false;
+let obstacleTimeout = null;
 
 //ground for loop
 const groundY = 250;
@@ -38,7 +39,7 @@ const wineBroken = new Image();
 wineBroken.src = 'pictures/glassOfWineCasse.png';
 
 const wineDown = new Image();
-wineDown.src= 'pictures/glassOfWinedaoun.png'
+wineDown.src= 'pictures/glassOfWinedown.png'
 
 let cheeseImg = new Image();
 cheeseImg.src = 'pictures/cheese.png';
@@ -58,6 +59,12 @@ tarteImg.src = 'pictures/tarte0.png';
 const wineImages= [wineRight, wineLeft];
 let imageIndex = 0;
 
+setInterval(function() { 
+    imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
+}, 150); // Change image every 500 milliseconds
+
+
+//Sounds
 const jumpSound = new Audio('sounds/JUMP.mp3');
 const beforeGameOverSound = new Audio('sounds/beforeGAMEOVER.mp3');
 const gameOverSound = new Audio('sounds/GAMEOVER.mp3');
@@ -66,13 +73,11 @@ const backgroundMusic = new Audio('sounds/MUSICBG.mp3');
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.5; // Adjust volume as needed
 
-setInterval(function() { 
-    imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
-}, 150); // Change image every 500 milliseconds
 
+//Obstacles
 let obstacles = [];
 let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
-let spawnTimer = 0;
+
 
 
 function updatePlayer() {
@@ -92,25 +97,30 @@ function updateObstacles() {
         obstacles[i].x -= gameSpeed;
         // Check collision
         if (checkCollision(wine, obstacles[i])) {
-            if(obstacles[i].image=== airplaneImg && !wine.isbenddown){
                 handleGameOver()
             }
-            else { 
-                handleGameOver();
-            }
-        }
-        // Remove obstacles that are off-screen
+        
         if (obstacles[i].x + obstacles[i].width < 0) {
+            
             obstacles.splice(i, 1);
         }
-    }
+        }
+    
 }
 
 function checkCollision(player, obj) {
+    let playerY = player.y;
+    let playerHeight = player.height;
+    if (player.isbenddown) {
+        playerY += 30;
+        playerHeight -= 30; // Hitbox is actually shorter when crouching
+    }
+
+
     return player.x < obj.x + obj.width &&
            player.x + player.width > obj.x &&
-           player.y < obj.y + obj.height &&
-           player.y + player.height > obj.y;
+           playerY < obj.y + obj.height &&
+           playerY + playerHeight > obj.y;
 }
 
 //generate obstacles at random intervals and types
@@ -140,7 +150,7 @@ function draw() {
     if (isGameOver) {
         ctx.drawImage(currentSprite, wine.x, wine.y, 120, 100); 
     } else if (wine.isbenddown) {
-        ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
+        ctx.drawImage(currentSprite, wine.x, wine.y + 20, 80,80);
     } else {
         ctx.drawImage(currentSprite, wine.x, wine.y, wine.width, wine.height);
     }
@@ -161,17 +171,13 @@ function gameLoop() {
     updateObstacles();
     if (isGameOver) return;
     score += 0.1;
+    gameSpeed = 6 + Math.floor(score / 100); // Increase speed every 100 points
     draw();
     requestAnimationFrame(gameLoop);
 }
 
-function drawstart(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(backgroundImage,0,0,canvas.width, canvas.height);
-    ctx.fillStyle="black";
-    ctx.font = "20px Times New Roman";
-    ctx.fillText("Press Enter to start", 20, 30);
-}
+
+
 
 //function to handle game over when the player collides with an obstacle
 function handleGameOver() {
@@ -204,6 +210,8 @@ function resetGame() {
     obstacles = [];
     wine.y = groundY;
     wine.velocityY = 0;
+    wine.isOnGround = true;
+    wine.isbenddown = false;
     isGameOver = false;
     beforeGameOverSound.pause();
     beforeGameOverSound.currentTime = 0;
@@ -211,6 +219,9 @@ function resetGame() {
     gameOverSound.currentTime = 0;
     
     backgroundMusic.play();
+    
+    
+    clearTimeout(obstacleTimeout);  //
     gameLoop();
     nextObstacle();
 }
@@ -218,6 +229,7 @@ function resetGame() {
 // User input
 document.addEventListener("keydown", function (event) {
     if (event.code === "Space" && wine.isOnGround && gamestart) {
+        event.preventDefault(); // Prevent spacebar from scrolling the page
         wine.velocityY = wine.jumpForce;
         wine.isOnGround = false;
         jumpSound.currentTime = 0; 
@@ -233,6 +245,17 @@ document.addEventListener("keydown", function (event) {
         gameLoop();
         nextObstacle()
     } 
+
+    if (event.code === "ArrowDown") {
+        event.preventDefault();
+        wine.isbenddown = true;
+    }
+});
+
+document.addEventListener("keyup", function(event) {
+    if (event.code === "ArrowDown") {
+        wine.isbenddown = false;
+    }
  
 });
 
@@ -248,6 +271,7 @@ backgroundImage.onload = function() {
 
 // start screen
 function drawStartScreen () {
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "rgba(0,0,0,0.5)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
@@ -261,8 +285,11 @@ function drawStartScreen () {
 function nextObstacle() {
     if (isGameOver) return;
     let minDelay = Math.max(600, 1500 - gameSpeed * 50);
+    
     let randomDelay = Math.random() * 1000 + minDelay;
-    setTimeout(function() {
+
+    
+    obstacleTimeout = setTimeout(function() {  // ← lagre referansen
         spawnObstacle();
         nextObstacle();
     }, randomDelay);
@@ -274,11 +301,13 @@ function wineWalk() {
     if (isGameOver) {
         return wineBroken;
     }
-    if (score===0&& wine.isOnGround) {
+    if (wine.isbenddown) {
+        return wineDown;
+    }
+    if (score===0 && wine.isOnGround) {
         return wineStand;
     }
-    if (!wine.isOnGround) {
-        return wineImages[imageIndex];
-    }
+    
+    
     return wineImages[imageIndex];
 }
