@@ -2,6 +2,7 @@
 const canvas = document.getElementById("background");
 const ctx = canvas.getContext("2d");
 
+// Game variables
 let score = 0;
 let gameSpeed = 6;
 let isGameOver = false;
@@ -11,6 +12,7 @@ let obstacleTimeout = null;
 //ground for loop
 const groundY = 250;
 
+// Player object
 let wine = {
     x: 50,
     y: groundY,
@@ -23,6 +25,7 @@ let wine = {
     isbenddown: false
 };
 
+// Images
 const backgroundImage = new Image();
 backgroundImage.src = "pictures/background inspirational wonderful.png";
 
@@ -56,12 +59,14 @@ candleImg.src = 'pictures/candle.png';
 let tarteImg = new Image();
 tarteImg.src = 'pictures/tarte0.png';
 
+// For the walking animation of the wine glass
 const wineImages= [wineRight, wineLeft];
 let imageIndex = 0;
 
+// Change between the two walking images every 150 milliseconds
 setInterval(function() { 
     imageIndex = (imageIndex + 1) % wineImages.length; // Toggle between 0 and 1
-}, 150); // Change image every 500 milliseconds
+}, 150); // Change image every 150 milliseconds
 
 
 //Sounds
@@ -80,6 +85,7 @@ let obstacleTypes = [cheeseImg, baguetteImg, airplaneImg, candleImg, tarteImg];
 
 
 
+//Function to update the player's position and apply gravity
 function updatePlayer() {
     // Apply gravity
     wine.y += wine.velocityY;
@@ -92,6 +98,7 @@ function updatePlayer() {
     }
 }
 
+//Function to update the position of obstacles, check for collisions and remove off-screen obstacles
 function updateObstacles() {
     for (let i = obstacles.length - 1; i >= 0; i--) {
         obstacles[i].x -= gameSpeed;
@@ -108,6 +115,7 @@ function updateObstacles() {
     
 }
 
+//Function to check for collision between the player and an obstacle, taking into account the player's crouching state
 function checkCollision(player, obj) {
     let playerY = player.y;
     let playerHeight = player.height;
@@ -198,9 +206,6 @@ function handleGameOver() {
     ctx.font = "20px Times New Roman"; // smaller font
     ctx.fillText("Press Enter to play again", canvas.width / 2 - 100, canvas.height / 2 + 50); // +50 puts it below
     
-    //setTimeout(() => {
-       // alert("Final score: " + Math.floor(score));
-   // }, 100);
 }
 
 //function to reset the game when the player loses
@@ -226,7 +231,7 @@ function resetGame() {
     nextObstacle();
 }
 
-// User input
+// Event listeners for player input (jumping and crouching)
 document.addEventListener("keydown", function (event) {
     if (event.code === "Space" && wine.isOnGround && gamestart) {
         event.preventDefault(); // Prevent spacebar from scrolling the page
@@ -296,7 +301,7 @@ function nextObstacle() {
 }
 
 
-// glass of wine walking
+// glass of wine walking animation function that returns the appropriate image based on the game state and player's actions
 function wineWalk() {
     if (isGameOver) {
         return wineBroken;
