@@ -7,7 +7,7 @@ let score = 0;
 let gameSpeed = 6;
 let isGameOver = false;
 let gamestart= false;
-let obstacleTimeout = null;
+let obstacleTimeout = null; // To keep track of the obstacle spawning
 
 //ground for loop
 const groundY = 250;
@@ -121,7 +121,7 @@ function checkCollision(player, obj) {
     let playerHeight = player.height;
     if (player.isbenddown) {
         playerY += 30;
-        playerHeight -= 30; // Hitbox is actually shorter when crouching
+        playerHeight -= 30; // Hitbox is shorter when crouching
     }
 
 
@@ -294,7 +294,7 @@ function nextObstacle() {
     let randomDelay = Math.random() * 1000 + minDelay;
 
     
-    obstacleTimeout = setTimeout(function() {  // ← lagre referansen
+    obstacleTimeout = setTimeout(function() {  
         spawnObstacle();
         nextObstacle();
     }, randomDelay);
